@@ -81,7 +81,7 @@ export default function Customers() {
             </div>
           </section>
         )}
-        <p className="storage-note">Të dhënat ruhen përkohësisht dhe humbin kur backend-i ristartohet.</p>
+        <p className="storage-note">Të dhënat ruhen në databazë dhe mbeten edhe pas ristartimit të backend-it.</p>
       </main>
     </>
   )

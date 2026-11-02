@@ -4,6 +4,9 @@ React + TypeScript me Vite. Kërkon Node.js 22.12+ ose 24+ dhe npm.
 
 Nga rrënja e repository-t, nis backend-in në një terminal:
 
+Së pari përgatit PostgreSQL dhe connection string-un lokal sipas
+[udhëzimit të databazës](../docs/database-setup.md).
+
 ```powershell
 dotnet run --project backend/MiniERP.Api.csproj --launch-profile http
 ```
@@ -29,7 +32,7 @@ Faqja `src/pages/Customers.tsx` merr listën nga API-ja dhe dërgon formularin m
 Tipi është në `src/types/Customer.ts`; thirrjet HTTP janë në `src/api/customers.ts`.
 Email dhe phone lejojnë null. Nuk përdoret localStorage.
 
-Të dhënat ruhen vetëm në memorien e backend-it dhe humbin kur ai ristartohet.
+Të dhënat ruhen në PostgreSQL dhe mbeten edhe pas ristartimit të backend-it.
 Rifreskimi i frontend-it e merr sërish listën nga backend-i aktiv.
 Për të kontrolluar gabimin e lidhjes, ndal backend-in dhe rifresko faqen.
 Ndal secilin server me Ctrl+C. `node_modules/`, `dist/` dhe `.env.local` nuk përfshihen në Git.

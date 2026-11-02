@@ -1,19 +1,16 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
+using MiniERP.Data;
 using MiniERP.Models;
 
 namespace MiniERP.Services;
 
-public sealed class CustomerService
+public sealed class CustomerService(AppDbContext db)
 {
-    private readonly object gate = new();
-    private readonly List<Customer> customers = [];
-    private int nextId = 1;
-
-    public IReadOnlyList<Customer> GetAll()
-    {
-        lock (gate)
-            return customers.Select(Copy).ToArray();
-    }
+    public IReadOnlyList<Customer> GetAll() => db.Customers
+        .AsNoTracking()
+        .OrderBy(customer => customer.Id)
+        .ToArray();
 
     public Customer Add(Customer input)
     {
@@ -25,16 +22,8 @@ public sealed class CustomerService
         };
         Validator.ValidateObject(customer, new ValidationContext(customer), true);
         customer.Name = customer.Name.Trim();
-        lock (gate)
-        {
-            customer.Id = checked(nextId++);
-            customers.Add(customer);
-            return Copy(customer);
-        }
+        db.Customers.Add(customer);
+        db.SaveChanges();
+        return customer;
     }
-
-    private static Customer Copy(Customer customer) => new()
-    {
-        Id = customer.Id, Name = customer.Name, Email = customer.Email, Phone = customer.Phone
-    };
 }
