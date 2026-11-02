@@ -38,3 +38,18 @@ tbody th { font-weight: 600; }
   .count { margin-top: 28px; }
   th, td { padding: 18px 16px; }
 }
+.customer-form { padding: 24px; background: white; border: 1px solid #dfe7e3; border-radius: 12px; margin-bottom: 24px; }
+h2 { margin: 0 0 16px; font-size: 20px; }
+.form-fields { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+label { display: grid; gap: 6px; font-size: 14px; font-weight: 600; }
+label span { display: inline; }
+input { width: 100%; min-width: 0; padding: 10px 12px; border: 1px solid #adbbb3; border-radius: 6px; font: inherit; }
+button { margin-top: 18px; padding: 11px 20px; background: #22624e; color: white; border: 0; border-radius: 6px; font: inherit; cursor: pointer; }
+button:disabled { opacity: .6; cursor: wait; }
+input:focus-visible, button:focus-visible { outline: 2px solid #22624e; outline-offset: 3px; }
+.message { padding: 14px 18px; border-radius: 8px; margin-bottom: 20px; }
+.error { color: #872525; background: #fff0ef; }
+.success { color: #22583d; background: #e5f4e9; }
+.empty { padding: 24px; background: white; border: 1px solid #dfe7e3; border-radius: 12px; }
+.storage-note { margin-top: 20px; font-size: 12px; }
+@media (max-width: 700px) { .form-fields { grid-template-columns: 1fr; } }

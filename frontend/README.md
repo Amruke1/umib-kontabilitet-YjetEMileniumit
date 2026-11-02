@@ -2,25 +2,34 @@
 
 React + TypeScript me Vite. Kërkon Node.js 22.12+ ose 24+ dhe npm.
 
-Nga rrënja e repository-t:
+Nga rrënja e repository-t, nis backend-in në një terminal:
+
+```powershell
+dotnet run --project backend/MiniERP.Api.csproj --launch-profile http
+```
+
+Në një terminal tjetër:
 
 ```powershell
 cd frontend
 npm ci
+Copy-Item .env.example .env.local
 npm run dev -- --host 127.0.0.1 --port 5173 --strictPort
 ```
 
-Hap http://127.0.0.1:5173 për faqen “Klientët”. Ndale serverin me Ctrl+C.
+Hap http://127.0.0.1:5173. `VITE_API_URL` në `.env.local` përcakton adresën e
+backend-it (parazgjedhje http://localhost:5080). Rinis Vite pas ndryshimit të saj.
+CORS i backend-it lejon localhost dhe 127.0.0.1 në portin 5173.
 
 ```powershell
 npm run build
-npm run preview -- --host 127.0.0.1 --port 4173 --strictPort
 ```
 
-Build-i krijohet në `dist/`. Preview hapet në http://127.0.0.1:4173.
+Faqja `src/pages/Customers.tsx` merr listën nga API-ja dhe dërgon formularin me POST.
+Tipi është në `src/types/Customer.ts`; thirrjet HTTP janë në `src/api/customers.ts`.
+Email dhe phone lejojnë null. Nuk përdoret localStorage.
 
-- `src/pages/Customers.tsx`: faqja dhe tabela responsive (me rrëshqitje horizontale në telefon).
-- `src/types/Customer.ts`: tipi Customer; email dhe phone lejojnë null.
-- `src/data/customers.ts`: tre klientë fiktivë lokalë.
-
-Nuk ka lidhje me API apo databazë. `node_modules/` dhe `dist/` përjashtohen nga Git.
+Të dhënat ruhen vetëm në memorien e backend-it dhe humbin kur ai ristartohet.
+Rifreskimi i frontend-it e merr sërish listën nga backend-i aktiv.
+Për të kontrolluar gabimin e lidhjes, ndal backend-in dhe rifresko faqen.
+Ndal secilin server me Ctrl+C. `node_modules/`, `dist/` dhe `.env.local` nuk përfshihen në Git.
