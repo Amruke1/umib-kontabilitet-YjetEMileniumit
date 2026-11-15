@@ -14,16 +14,44 @@ public sealed class CustomerService(AppDbContext db)
 
     public Customer Add(Customer input)
     {
-        var customer = new Customer
-        {
-            Name = input.Name,
-            Email = string.IsNullOrEmpty(input.Email) ? null : input.Email,
-            Phone = string.IsNullOrEmpty(input.Phone) ? null : input.Phone
-        };
-        Validator.ValidateObject(customer, new ValidationContext(customer), true);
-        customer.Name = customer.Name.Trim();
+        var customer = Normalize(input);
         db.Customers.Add(customer);
         db.SaveChanges();
+        return customer;
+    }
+
+    public Customer? Get(int id) => db.Customers.AsNoTracking().SingleOrDefault(c => c.Id == id);
+
+    public Customer? Update(int id, Customer input)
+    {
+        var customer = db.Customers.Find(id);
+        if (customer is null) return null;
+        var normalized = Normalize(input);
+        customer.Name = normalized.Name;
+        customer.Email = normalized.Email;
+        customer.Phone = normalized.Phone;
+        db.SaveChanges();
+        return customer;
+    }
+
+    public bool Delete(int id)
+    {
+        var customer = db.Customers.Find(id);
+        if (customer is null) return false;
+        db.Customers.Remove(customer);
+        db.SaveChanges();
+        return true;
+    }
+
+    private static Customer Normalize(Customer input)
+    {
+        var customer = new Customer
+        {
+            Name = input.Name?.Trim() ?? string.Empty,
+            Email = string.IsNullOrWhiteSpace(input.Email) ? null : input.Email.Trim(),
+            Phone = string.IsNullOrWhiteSpace(input.Phone) ? null : input.Phone.Trim()
+        };
+        Validator.ValidateObject(customer, new ValidationContext(customer), true);
         return customer;
     }
 }

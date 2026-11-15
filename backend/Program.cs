@@ -17,7 +17,7 @@ builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connect
 builder.Services.AddScoped<CustomerService>();
 builder.Services.AddCors(options => options.AddPolicy("Frontend", policy =>
     policy.WithOrigins("http://127.0.0.1:5173", "http://localhost:5173")
-        .WithMethods("GET", "POST").AllowAnyHeader()));
+        .WithMethods("GET", "POST", "PUT", "DELETE").AllowAnyHeader()));
 
 var app = builder.Build();
 

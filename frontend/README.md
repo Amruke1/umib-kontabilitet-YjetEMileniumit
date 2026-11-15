@@ -2,6 +2,16 @@
 
 React + TypeScript me Vite. Kërkon Node.js 22.12+ ose 24+ dhe npm.
 
+## Demonstrimi pa databazë
+
+Nis frontend-in me `npm run dev` dhe hap `http://localhost:5173/?demo=1`.
+Parametri `demo=1` hap panelin me kontakte ilustruese pa kërkuar backend.
+Shtimi, ndryshimi, kërkimi dhe fshirja e kontakteve funksionojnë në memorien
+e sesionit. Navigimi ruan ndryshimet; rifreskimi ose ndërrimi i modalitetit
+i rivendos ato. Butoni në krye kalon mes demonstrimit dhe API-së reale.
+Produktet, porositë, magazina, financat dhe rolet janë të shënuara si të
+planifikuara dhe ende nuk janë implementuar.
+
 Nga rrënja e repository-t, nis backend-in në një terminal:
 
 Së pari përgatit PostgreSQL dhe connection string-un lokal sipas

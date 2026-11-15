@@ -12,6 +12,41 @@ public sealed class CustomersController(CustomerService service) : ControllerBas
     [HttpGet]
     public IActionResult Get() => Ok(service.GetAll());
 
+    [HttpGet("{id:int}")]
+    public IActionResult GetById(int id) => service.Get(id) is { } customer ? Ok(customer) : NotFound();
+
+    [HttpPut("{id:int}")]
+    public IActionResult Put(int id, CreateCustomerRequest request)
+    {
+        try
+        {
+            var customer = service.Update(id, new Customer
+            {
+                Name = request.Name, Email = request.Email, Phone = request.Phone
+            });
+            return customer is null ? NotFound() : Ok(customer);
+        }
+        catch (ValidationException exception)
+        {
+            ModelState.AddModelError("customer", exception.Message);
+            return ValidationProblem(ModelState);
+        }
+    }
+
+    [HttpDelete("{id:int}")]
+    public IActionResult Delete(int id)
+    {
+        try
+        {
+            return service.Delete(id) ? NoContent() : NotFound();
+        }
+        catch (Microsoft.EntityFrameworkCore.DbUpdateException exception)
+            when (exception.InnerException is Npgsql.PostgresException { SqlState: "23503" })
+        {
+            return Conflict(new ProblemDetails { Detail = "Klienti përdoret në regjistrime të tjera dhe nuk mund të fshihet." });
+        }
+    }
+
     [HttpPost]
     public IActionResult Post(CreateCustomerRequest request)
     {
@@ -21,7 +56,7 @@ public sealed class CustomersController(CustomerService service) : ControllerBas
             {
                 Name = request.Name, Email = request.Email, Phone = request.Phone
             });
-            return StatusCode(StatusCodes.Status201Created, customer);
+            return CreatedAtAction(nameof(GetById), new { id = customer.Id }, customer);
         }
         catch (ValidationException exception)
         {
