@@ -17,17 +17,17 @@ if (!string.IsNullOrWhiteSpace(configuredPort))
     builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
 }
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-if (string.IsNullOrWhiteSpace(connectionString))
+static string DatabaseConnection(IServiceProvider services)
 {
-    throw new InvalidOperationException(
+    var connection = services.GetRequiredService<IConfiguration>().GetConnectionString("DefaultConnection");
+    return !string.IsNullOrWhiteSpace(connection) ? connection : throw new InvalidOperationException(
         "Configure ConnectionStrings:DefaultConnection using .NET User Secrets " +
         "or ConnectionStrings__DefaultConnection. See docs/database-setup.md.");
 }
 
 builder.Services.AddControllers(options => options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute()));
-builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connectionString));
-builder.Services.AddDbContext<AuthDbContext>(options => options.UseNpgsql(connectionString,
+builder.Services.AddDbContext<AppDbContext>((services, options) => options.UseNpgsql(DatabaseConnection(services)));
+builder.Services.AddDbContext<AuthDbContext>((services, options) => options.UseNpgsql(DatabaseConnection(services),
     database => database.MigrationsHistoryTable("__EFMigrationsHistory", "auth")));
 builder.Services.AddApplicationSecurity(builder.Configuration, builder.Environment);
 builder.Services.AddScoped<CustomerService>();
