@@ -4,6 +4,21 @@ React dhe API-ja ASP.NET Core publikohen si një aplikacion në Render Free.
 PostgreSQL ruhet veçmas në Neon Free. Të dhënat nuk varen nga kompjuteri lokal
 ose nga disku i përkohshëm i Render-it.
 
+## Gjendja e konfigurimit më 17 nëntor 2026
+
+- Projekti Neon **mini-erp-yjet-e-mileniumit** është krijuar në planin Free,
+  në AWS Frankfurt, me databazën `mini_erp` dhe branch-in `production`.
+- `Database/customers.sql` është ekzekutuar me sukses. Një kontroll te
+  `information_schema.columns` konfirmoi kolonat `id`, `name`, `email`, `phone`,
+  gjatësitë, NULL dhe identity sipas modelit ekzistues.
+- [Hap SQL Editor të projektit](https://console.neon.tech/app/projects/red-shape-41284864/branches/br-falling-heart-b9bh6v8u/sql-editor?database=mini_erp).
+  Kjo adresë kërkon hyrje në llogarinë përkatëse dhe nuk përmban kredenciale.
+- Render ende nuk është publikuar. Fillimisht pronari i repository-t duhet
+  të lejojë GitHub App të Render-it vetëm për këtë repository privat dhe
+  kodi i publikimit duhet të jetë në `main`.
+- Testi nga faqja deri te API-ja dhe ruajtja pas ristartimit mbeten për t'u
+  ekzekutuar në adresën e Render-it pas publikimit.
+
 ## Si punon ekipi
 
 Çdo anëtar vazhdon me branch, commit, push dhe Pull Request në GitHub.
