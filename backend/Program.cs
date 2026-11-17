@@ -25,7 +25,7 @@ static string DatabaseConnection(IServiceProvider services)
         "or ConnectionStrings__DefaultConnection. See docs/database-setup.md.");
 }
 
-builder.Services.AddControllers(options => options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute()));
+builder.Services.AddControllersWithViews(options => options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute()));
 builder.Services.AddDbContext<AppDbContext>((services, options) => options.UseNpgsql(DatabaseConnection(services)));
 builder.Services.AddDbContext<AuthDbContext>((services, options) => options.UseNpgsql(DatabaseConnection(services),
     database => database.MigrationsHistoryTable("__EFMigrationsHistory", "auth")));
