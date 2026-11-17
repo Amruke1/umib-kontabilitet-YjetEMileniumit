@@ -1,5 +1,8 @@
 # Mini ERP API
 
+Për publikimin falas të React + API në Render me PostgreSQL në Neon, ndiq
+[konfigurimin online](../docs/online-deployment.md).
+
 Kërkon .NET SDK 10 dhe PostgreSQL. Projekti përdor ASP.NET Core Web API me
 Controllers, EF Core dhe Npgsql.
 
@@ -39,5 +42,6 @@ Nis frontend-in në portin 5173 (shih `frontend/README.md`). CORS lejon
 `GetAll()` dhe `Add(Customer input)` ruhen, ndërsa të dhënat lexohen dhe ruhen
 në `public.customers`. Regjistrimet mbeten edhe pas ristartimit të backend-it.
 
-`GET /health` kontrollon nëse API-ja është nisur; nuk kontrollon lidhjen me
-PostgreSQL. Për ta provuar databazën, përdor `GET /api/customers`.
+`GET /health` kontrollon nëse API-ja është nisur. `GET /health/ready` kontrollon
+edhe nëse tabela `customers` mund të lexohet nga PostgreSQL; kthen 503 nëse
+lidhja ose tabela nuk është në dispozicion.

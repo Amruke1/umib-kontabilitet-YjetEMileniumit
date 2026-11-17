@@ -1,6 +1,7 @@
 import type { Customer } from '../types/Customer'
 
-const apiUrl = (import.meta.env.VITE_API_URL ?? 'http://localhost:5080').replace(/\/$/, '')
+const apiUrl = (import.meta.env.VITE_API_URL?.trim()
+  || (import.meta.env.DEV ? 'http://localhost:5080' : '')).replace(/\/$/, '')
 export type NewCustomer = Omit<Customer, 'id'>
 
 async function request<T>(init?: RequestInit, path = ''): Promise<T> {

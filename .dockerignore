@@ -1,0 +1,11 @@
+.git
+**/node_modules
+**/bin
+**/obj
+**/dist
+**/.env
+**/.env.*
+**/secrets.json
+**/appsettings.*.local.json
+**/*.log
+backups
