@@ -13,11 +13,15 @@ ose nga disku i përkohshëm i Render-it.
   gjatësitë, NULL dhe identity sipas modelit ekzistues.
 - [Hap SQL Editor të projektit](https://console.neon.tech/app/projects/red-shape-41284864/branches/br-falling-heart-b9bh6v8u/sql-editor?database=mini_erp).
   Kjo adresë kërkon hyrje në llogarinë përkatëse dhe nuk përmban kredenciale.
-- Render ende nuk është publikuar. Fillimisht pronari i repository-t duhet
-  të lejojë GitHub App të Render-it vetëm për këtë repository privat dhe
-  kodi i publikimit duhet të jetë në `main`.
-- Testi nga faqja deri te API-ja dhe ruajtja pas ristartimit mbeten për t'u
-  ekzekutuar në adresën e Render-it pas publikimit.
+- Aplikacioni është publikuar në **Render Free**:
+  [Hap Mini ERP](https://mini-erp-yjet-e-mileniumit.onrender.com/).
+  Frontend-i dhe API-ja përdorin të njëjtën adresë; të dhënat ruhen në Neon.
+- GitHub App i Render-it ka qasje te repository privat. Blueprint-i
+  `mini-erp-yjet-e-mileniumit` ndjek branch-in `main` dhe publikon ndryshimet
+  pas bashkimit të Pull Request-eve, pavarësisht autorit të commit-it.
+- Connection string-u real ruhet vetëm te konfigurimi privat i Render-it.
+  `/health` dhe `/health/ready` kthyen 200; rrugët API që nuk ekzistojnë kthyen 404.
+  Për kontrollin e plotë të klientëve dhe ruajtjes, ndiq seksionin 3 më poshtë.
 
 ## Si punon ekipi
 

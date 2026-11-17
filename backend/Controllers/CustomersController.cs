@@ -56,7 +56,7 @@ public sealed class CustomersController(CustomerService service) : ControllerBas
             {
                 Name = request.Name, Email = request.Email, Phone = request.Phone
             });
-            return CreatedAtAction(nameof(GetById), new { id = customer.Id }, customer);
+            return Created($"/api/customers/{customer.Id}", customer);
         }
         catch (ValidationException exception)
         {
