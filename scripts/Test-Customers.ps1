@@ -17,12 +17,16 @@ try {
 
     $name = "ERP smoke test $([guid]::NewGuid().ToString('N'))"
     $body = @{ name = "  $name  "; email = '  test@example.com  '; phone = '  ' } | ConvertTo-Json
-    $created = Invoke-WebRequest $endpoint -Method Post -ContentType 'application/json' -Body $body -SkipHttpErrorCheck
+    $created = Invoke-WebRequest $endpoint -Method Post -ContentType 'application/json' -Body $body -SkipHttpErrorCheck -MaximumRedirection 0
     Assert-Status $created 201
     $customer = $created.Content | ConvertFrom-Json
     $createdId = $customer.id
     if ($customer.name -ne $name -or $customer.email -ne 'test@example.com' -or $null -ne $customer.phone) { throw 'Normalization failed.' }
     if (-not $created.Headers.Location) { throw 'Creation must return a Location header.' }
+    $location = [uri]::new([uri]$endpoint, [string]$created.Headers.Location[0])
+    if ($location.Scheme -ne ([uri]$endpoint).Scheme -or $location.Authority -ne ([uri]$endpoint).Authority) {
+        throw 'Creation Location must retain the API origin and HTTPS scheme.'
+    }
 
     Assert-Status (Invoke-WebRequest "$endpoint/$createdId" -SkipHttpErrorCheck) 200
     $invalidUpdate = Invoke-WebRequest "$endpoint/$createdId" -Method Put -ContentType 'application/json' -Body '{"name":" "}' -SkipHttpErrorCheck
