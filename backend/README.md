@@ -1,5 +1,8 @@
 # Mini ERP API
 
+Për hyrjen, katër rolet dhe konfigurimin e administratorit të parë, shih
+[Hyrja dhe rolet](../docs/roles-and-login.md).
+
 Për publikimin falas të React + API në Render me PostgreSQL në Neon, ndiq
 [konfigurimin online](../docs/online-deployment.md).
 

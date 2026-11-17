@@ -10,9 +10,10 @@ type Props = {
   loading: boolean
   connected: boolean
   retry: () => void
+  canManage: boolean
 }
 
-export default function Customers({ customers, setCustomers, demo, loading, connected, retry }: Props) {
+export default function Customers({ customers, setCustomers, demo, loading, connected, retry, canManage }: Props) {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
@@ -32,6 +33,7 @@ export default function Customers({ customers, setCustomers, demo, loading, conn
   }
 
   function edit(customer: Customer) {
+    if (!canManage) return
     setEditingId(customer.id); setName(customer.name)
     setEmail(customer.email ?? ''); setPhone(customer.phone ?? '')
     setError(''); setSuccess(''); setPendingDelete(null)
@@ -39,7 +41,7 @@ export default function Customers({ customers, setCustomers, demo, loading, conn
   }
 
   async function confirmDelete() {
-    if (!pendingDelete || submitting.current) return
+    if (!canManage || !pendingDelete || submitting.current) return
     submitting.current = true; setSaving(true); setError(''); setSuccess('')
     try {
       if (!demo) await deleteCustomer(pendingDelete.id)
@@ -53,7 +55,7 @@ export default function Customers({ customers, setCustomers, demo, loading, conn
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    if (submitting.current || loading || !connected) return
+    if (!canManage || submitting.current || loading || !connected) return
     setError('')
     setSuccess('')
     if (!name.trim()) { setError('Emri është i detyrueshëm.'); return }
@@ -82,7 +84,8 @@ export default function Customers({ customers, setCustomers, demo, loading, conn
           <span className="count">{connected ? customers.length : '—'} klientë</span>
         </div>
         {!connected && !loading && <div className="message error" role="alert">API-ja nuk është e qasshme. Hapni demonstrimin ose provoni lidhjen përsëri. <button type="button" className="text-button" onClick={retry}>Provo përsëri</button></div>}
-        <form className="customer-form" onSubmit={submit}>
+        {!canManage && <p className="message" role="status">Keni qasje vetëm për leximin e klientëve.</p>}
+        {canManage && <form className="customer-form" onSubmit={submit}>
           <h2>{editingId === null ? 'Shto klient' : `Ndrysho klientin #${editingId}`}</h2>
           <div className="form-fields">
             <label><span>Emri <span aria-hidden="true">*</span></span><input name="name" required maxLength={150} value={name} onChange={(event) => setName(event.target.value)} disabled={saving} autoComplete="name" /></label>
@@ -91,9 +94,9 @@ export default function Customers({ customers, setCustomers, demo, loading, conn
           </div>
           <button type="submit" disabled={saving || loading || !connected}>{saving ? 'Duke ruajtur…' : editingId === null ? '+ Shto klientin' : 'Ruaj ndryshimet'}</button>
           {editingId !== null && <button className="secondary" type="button" disabled={saving} onClick={resetForm}>Anulo ndryshimin</button>}
-        </form>
+        </form>}
         <label className="search-field">Kërko klient<input type="search" value={query} onChange={event => setQuery(event.target.value)} placeholder="Emri, email, telefoni ose ID" /></label>
-        {pendingDelete && <section className="delete-confirmation" aria-label="Konfirmo fshirjen">
+        {canManage && pendingDelete && <section className="delete-confirmation" aria-label="Konfirmo fshirjen">
           <p>Fshi klientin <strong>{pendingDelete.name}</strong>? Ky veprim nuk mund të kthehet.</p>
           <button className="danger" type="button" disabled={saving} onClick={confirmDelete}>Konfirmo fshirjen</button>
           <button className="secondary" type="button" disabled={saving} onClick={() => setPendingDelete(null)}>Anulo</button>
@@ -107,13 +110,13 @@ export default function Customers({ customers, setCustomers, demo, loading, conn
             <div className="table-scroll" tabIndex={0} role="region" aria-label="Tabela e klientëve; rrëshqitni horizontalisht në ekran të vogël">
               <table>
                 <caption className="visually-hidden">Klientët dhe të dhënat e kontaktit</caption>
-                <thead><tr><th scope="col">ID</th><th scope="col">Emri</th><th scope="col">Email</th><th scope="col">Telefoni</th><th scope="col">Veprimet</th></tr></thead>
+                <thead><tr><th scope="col">ID</th><th scope="col">Emri</th><th scope="col">Email</th><th scope="col">Telefoni</th>{canManage && <th scope="col">Veprimet</th>}</tr></thead>
                 <tbody>{visibleCustomers.map((customer) => (
                   <tr key={customer.id}>
                     <td className="customer-id">{customer.id}</td><th scope="row">{customer.name}</th>
                     <td>{customer.email ?? <span className="missing">Nuk është vendosur</span>}</td>
                     <td>{customer.phone ?? <span className="missing">Nuk është vendosur</span>}</td>
-                    <td className="row-actions"><button type="button" disabled={saving} onClick={() => edit(customer)} aria-label={`Ndrysho ${customer.name}`}>Ndrysho</button><button className="danger" type="button" disabled={saving} onClick={() => setPendingDelete(customer)} aria-label={`Fshi ${customer.name}`}>Fshi</button></td>
+                    {canManage && <td className="row-actions"><button type="button" disabled={saving} onClick={() => edit(customer)} aria-label={`Ndrysho ${customer.name}`}>Ndrysho</button><button className="danger" type="button" disabled={saving} onClick={() => setPendingDelete(customer)} aria-label={`Fshi ${customer.name}`}>Fshi</button></td>}
                   </tr>
                 ))}</tbody>
               </table>
