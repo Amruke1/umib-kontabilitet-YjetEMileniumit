@@ -1,5 +1,10 @@
 # Mini ERP — Frontend
 
+Për publikimin falas bashkë me API-në në Render dhe databazën në Neon, ndiq
+[konfigurimin online](../docs/online-deployment.md). Në këtë variant faqja
+përdor `/api/customers` në të njëjtën adresë; `VITE_API_URL` lihet i pavendosur
+gjatë build-it.
+
 React + TypeScript me Vite. Kërkon Node.js 22.12+ ose 24+ dhe npm.
 
 ## Demonstrimi pa databazë

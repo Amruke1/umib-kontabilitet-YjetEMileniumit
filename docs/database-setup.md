@@ -108,8 +108,12 @@ të mungojnë; këto vlera ruhen si NULL.
 - Konteksti dhe shërbimi regjistrohen si scoped në `Program.cs`.
 - Frontend-i dhe kontrata JSON e GET/POST mbeten me `id`, `name`, `email`, `phone`.
 
-Për këtë fazë, skema krijohet me `Database/customers.sql`. Aplikacioni nuk
-krijon ose ndryshon automatikisht tabela gjatë nisjes. Para përdorimit të
+Për këtë fazë, skema krijohet me `Database/customers.sql`. Skripti mund të
+ekzekutohet përsëri: `IF NOT EXISTS` ruan tabelën ekzistuese. Në konfigurimin
+online, `Database__InitializeSchema=true` e ekzekuton këtë skript gjatë nisjes.
+Lokalisht ky opsion është i çaktivizuar si parazgjedhje. Ky hap krijon vetëm
+tabelën nëse mungon; nuk ndryshon kolonat apo regjistrimet ekzistuese dhe nuk
+zëvendëson migrimet për ndryshime të ardhshme të skemës. Para përdorimit të
 migrimeve EF Core, Amra dhe Th duhet të dakordojnë si do të trajtohet tabela
 ekzistuese; një migrim fillestar që krijon `customers` nuk aplikohet mbi të
 njëjtën tabelë që ekziston tashmë.

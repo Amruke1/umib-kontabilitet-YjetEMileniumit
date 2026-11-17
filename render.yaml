@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: mini-erp-yjet-e-mileniumit
+    runtime: docker
+    plan: free
+    region: frankfurt
+    branch: main
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    autoDeployTrigger: commit
+    healthCheckPath: /health/ready
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: PORT
+        value: "10000"
+      - key: Database__InitializeSchema
+        value: "true"
+      - key: ConnectionStrings__DefaultConnection
+        sync: false
