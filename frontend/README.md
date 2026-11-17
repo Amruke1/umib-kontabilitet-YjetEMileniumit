@@ -1,5 +1,7 @@
 # Mini ERP — Frontend
 
+Hyrja dhe lejet sipas rolit dokumentohen te [Hyrja dhe rolet](../docs/roles-and-login.md).
+
 Për publikimin falas bashkë me API-në në Render dhe databazën në Neon, ndiq
 [konfigurimin online](../docs/online-deployment.md). Në këtë variant faqja
 përdor `/api/customers` në të njëjtën adresë; `VITE_API_URL` lihet i pavendosur

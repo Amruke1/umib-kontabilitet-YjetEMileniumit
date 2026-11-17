@@ -2,11 +2,15 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using MiniERP.Models;
 using MiniERP.Services;
+using Microsoft.AspNetCore.Authorization;
+using MiniERP.Security;
 
 namespace MiniERP.Controllers;
 
 [ApiController]
 [Route("api/customers")]
+[Authorize(Policy = AccessPolicies.CustomerRead)]
+[ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
 public sealed class CustomersController(CustomerService service) : ControllerBase
 {
     [HttpGet]
@@ -16,6 +20,7 @@ public sealed class CustomersController(CustomerService service) : ControllerBas
     public IActionResult GetById(int id) => service.Get(id) is { } customer ? Ok(customer) : NotFound();
 
     [HttpPut("{id:int}")]
+    [Authorize(Policy = AccessPolicies.CustomerWrite)]
     public IActionResult Put(int id, CreateCustomerRequest request)
     {
         try
@@ -34,6 +39,7 @@ public sealed class CustomersController(CustomerService service) : ControllerBas
     }
 
     [HttpDelete("{id:int}")]
+    [Authorize(Policy = AccessPolicies.CustomerWrite)]
     public IActionResult Delete(int id)
     {
         try
@@ -48,6 +54,7 @@ public sealed class CustomersController(CustomerService service) : ControllerBas
     }
 
     [HttpPost]
+    [Authorize(Policy = AccessPolicies.CustomerWrite)]
     public IActionResult Post(CreateCustomerRequest request)
     {
         try

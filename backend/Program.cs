@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using MiniERP.Data;
 using MiniERP.Services;
+using MiniERP.Security;
+using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,16 +17,19 @@ if (!string.IsNullOrWhiteSpace(configuredPort))
     builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
 }
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-if (string.IsNullOrWhiteSpace(connectionString))
+static string DatabaseConnection(IServiceProvider services)
 {
-    throw new InvalidOperationException(
+    var connection = services.GetRequiredService<IConfiguration>().GetConnectionString("DefaultConnection");
+    return !string.IsNullOrWhiteSpace(connection) ? connection : throw new InvalidOperationException(
         "Configure ConnectionStrings:DefaultConnection using .NET User Secrets " +
         "or ConnectionStrings__DefaultConnection. See docs/database-setup.md.");
 }
 
-builder.Services.AddControllers();
-builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connectionString));
+builder.Services.AddControllersWithViews(options => options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute()));
+builder.Services.AddDbContext<AppDbContext>((services, options) => options.UseNpgsql(DatabaseConnection(services)));
+builder.Services.AddDbContext<AuthDbContext>((services, options) => options.UseNpgsql(DatabaseConnection(services),
+    database => database.MigrationsHistoryTable("__EFMigrationsHistory", "auth")));
+builder.Services.AddApplicationSecurity(builder.Configuration, builder.Environment);
 builder.Services.AddScoped<CustomerService>();
 var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
     ?? (builder.Environment.IsDevelopment()
@@ -32,17 +37,24 @@ var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get
         : []);
 builder.Services.AddCors(options => options.AddPolicy("Frontend", policy =>
     policy.WithOrigins(allowedOrigins)
-        .WithMethods("GET", "POST", "PUT", "DELETE").AllowAnyHeader()));
+        .WithMethods("GET", "POST", "PUT", "DELETE").AllowAnyHeader().AllowCredentials()));
 
 var app = builder.Build();
 
-if (app.Configuration.GetValue<bool>("Database:InitializeSchema"))
 {
     await using var scope = app.Services.CreateAsyncScope();
-    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    var schemaPath = Path.Combine(AppContext.BaseDirectory, "Database", "customers.sql");
-    await db.Database.ExecuteSqlRawAsync(await File.ReadAllTextAsync(schemaPath));
+    if (app.Configuration.GetValue<bool>("Database:InitializeSchema"))
+    {
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var schemaPath = Path.Combine(AppContext.BaseDirectory, "Database", "customers.sql");
+        await db.Database.ExecuteSqlRawAsync(await File.ReadAllTextAsync(schemaPath));
+        await scope.ServiceProvider.GetRequiredService<AuthDbContext>().Database.MigrateAsync();
+    }
+    await IdentitySetup.SeedRolesAsync(scope.ServiceProvider);
 }
+
+if (!app.Environment.IsDevelopment())
+    app.UseCookiePolicy(new CookiePolicyOptions { Secure = CookieSecurePolicy.Always });
 
 var servesFrontend = File.Exists(Path.Combine(app.Environment.ContentRootPath, "wwwroot", "index.html"));
 if (servesFrontend)
@@ -51,14 +63,20 @@ if (servesFrontend)
     app.UseStaticFiles();
 }
 
+app.UseRouting();
 app.UseCors("Frontend");
+app.UseAuthentication();
+app.UseRateLimiter();
+app.UseAuthorization();
 app.MapControllers();
 
 if (servesFrontend)
 {
-    app.MapFallback("/api/{**path}", () => Results.NotFound());
-    app.MapFallback("/health/{**path}", () => Results.NotFound());
-    app.MapFallbackToFile("index.html");
+    app.MapFallback("/api/{**path}", () => Results.NotFound()).AllowAnonymous();
+    app.MapFallback("/health/{**path}", () => Results.NotFound()).AllowAnonymous();
+    app.MapFallbackToFile("index.html").AllowAnonymous();
 }
 
 app.Run();
+
+public partial class Program;

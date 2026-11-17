@@ -4,6 +4,10 @@ React dhe API-ja ASP.NET Core publikohen si një aplikacion në Render Free.
 PostgreSQL ruhet veçmas në Neon Free. Të dhënat nuk varen nga kompjuteri lokal
 ose nga disku i përkohshëm i Render-it.
 
+Për hyrjen, lejet e katër roleve dhe krijimin e administratorit të parë, ndiq
+[Hyrja dhe rolet](roles-and-login.md). Përveç lidhjes së databazës, Blueprint-i
+gjeneron kodin privat `Auth__BootstrapToken` për konfigurimin një herë.
+
 ## Gjendja e konfigurimit më 17 nëntor 2026
 
 - Projekti Neon **mini-erp-yjet-e-mileniumit** është krijuar në planin Free,
@@ -104,7 +108,8 @@ Në adresën HTTPS që kthen Render:
 Nga PowerShell 7 mund të ekzekutosh edhe kontrollin ekzistues CRUD:
 
 ```powershell
-pwsh -File scripts/Test-Customers.ps1 -BaseUrl 'https://YOUR_SERVICE.onrender.com'
+$credential = Get-Credential -Message 'Llogaria Administrator ose Shitës e Mini ERP'
+./scripts/Test-Customers.ps1 -BaseUrl 'https://YOUR_SERVICE.onrender.com' -Credential $credential
 ```
 
 Ky skript krijon dhe fshin vetëm klientin e vet fiktiv të testit.
@@ -119,8 +124,8 @@ Një rrugë API që nuk ekziston duhet të kthejë 404, jo faqen HTML të React-
 - Neon e ndal compute-in pas pasivitetit dhe e nis automatikisht kur vjen një kërkesë.
 - Ruaj kopje të të dhënave të rëndësishme me mjetet e PostgreSQL; push në GitHub
   ruan kodin dhe skemën, jo regjistrimet e databazës.
-- API-ja aktuale nuk ka ende autentikim; përdor vetëm të dhëna fiktive të projektit.
-  Kontrolli i përdoruesve dhe roleve është detyrë më vete.
+- Përdor vetëm të dhëna fiktive të projektit. API-ja kërkon hyrje dhe kontrollon
+  rolet sipas `roles-and-login.md`; regjistrimi i përdoruesve është i rezervuar për administratorin.
 
 Modaliteti Demonstrim i ndërfaqes përdor vetëm shembuj në memorie dhe nuk ruan në Neon.
 

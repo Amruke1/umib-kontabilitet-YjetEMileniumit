@@ -2,12 +2,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MiniERP.Data;
 using Npgsql;
+using Microsoft.AspNetCore.Authorization;
 
 namespace MiniERP.Controllers;
 
 [ApiController]
 [Route("health")]
-public class HealthController(AppDbContext db, ILogger<HealthController> logger) : ControllerBase
+[AllowAnonymous]
+public class HealthController(AppDbContext db, AuthDbContext auth, ILogger<HealthController> logger) : ControllerBase
 {
     [HttpGet]
     public IActionResult Get() => Ok(new { status = "ok" });
@@ -17,7 +19,9 @@ public class HealthController(AppDbContext db, ILogger<HealthController> logger)
     {
         try
         {
-            await db.Customers.AsNoTracking().Select(customer => customer.Id)
+            await db.Customers.AsNoTracking().OrderBy(customer => customer.Id).Select(customer => customer.Id)
+                .Take(1).ToArrayAsync(cancellationToken);
+            await auth.Users.AsNoTracking().OrderBy(user => user.Id).Select(user => user.Id)
                 .Take(1).ToArrayAsync(cancellationToken);
             return Ok(new { status = "ready" });
         }
